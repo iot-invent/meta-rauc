@@ -79,6 +79,21 @@
 # Enable building casync bundles with
 #
 #   RAUC_CASYNC_BUNDLE = "1"
+#
+# To define custom manifest 'meta' sections, you may use
+# 'RAUC_META_SECTIONS' as follows:
+#
+#   RAUC_META_SECTIONS = "mydata foo"
+#
+#   RAUC_META_mydata[release-type] = "beta"
+#   RAUC_META_mydata[release-notes] = "a few notes here"
+#
+#   RAUC_META_foo[bar] = "baz"
+#
+# Adding any sort of additional lines to the manifest can be done with the
+# RAUC_MANIFEST_EXTRA_LINES variable (using '\n' to indicate newlines):
+#
+#   RAUC_MANIFEST_EXTRA_LINES = "[section]\nkey=value\n"
 
 LICENSE ?= "MIT"
 
@@ -305,6 +320,15 @@ def write_manifest(d):
         if not os.path.exists(bundle_imgpath):
             raise bb.fatal("Failed adding image '%s' to bundle: not present in DEPLOY_DIR_IMAGE or WORKDIR" % imgsource)
 
+    for meta_section in (d.getVar('RAUC_META_SECTIONS') or "").split():
+        manifest.write("[meta.%s]\n" % meta_section)
+        for meta_key in d.getVarFlags('RAUC_META_%s' % meta_section):
+            meta_value = d.getVarFlag('RAUC_META_%s' % meta_section, meta_key)
+            manifest.write("%s=%s\n" % (meta_key, meta_value))
+        manifest.write("\n");
+
+    manifest.write((d.getVar('RAUC_MANIFEST_EXTRA_LINES') or "").replace(r'\n', '\n'))
+
     manifest.close()
 
 def try_searchpath(file, d):
@@ -439,7 +463,7 @@ do_deploy() {
 	ln -sf ${BUNDLE_NAME}${BUNDLE_EXTENSION} ${DEPLOYDIR}/${BUNDLE_LINK_NAME}${BUNDLE_EXTENSION}
 
 	if [ ${RAUC_CASYNC_BUNDLE} -eq 1 ]; then
-		install ${B}/casync-bundle.raucb ${DEPLOYDIR}/${CASYNC_BUNDLE_NAME}${CASYNC_BUNDLE_EXTENSION}
+		install -m 0644 ${B}/casync-bundle.raucb ${DEPLOYDIR}/${CASYNC_BUNDLE_NAME}${CASYNC_BUNDLE_EXTENSION}
 		cp -r ${B}/casync-bundle.castr ${DEPLOYDIR}/${CASYNC_BUNDLE_NAME}.castr
 		ln -sf ${CASYNC_BUNDLE_NAME}${CASYNC_BUNDLE_EXTENSION} ${DEPLOYDIR}/${CASYNC_BUNDLE_LINK_NAME}${CASYNC_BUNDLE_EXTENSION}
 		ln -sf ${CASYNC_BUNDLE_NAME}.castr ${DEPLOYDIR}/${CASYNC_BUNDLE_LINK_NAME}.castr

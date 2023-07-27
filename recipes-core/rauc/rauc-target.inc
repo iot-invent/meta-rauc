@@ -20,7 +20,7 @@ INITSCRIPT_PARAMS:${PN}-mark-good = "start 99 5 2 . stop 20 0 1 6 ."
 inherit systemd update-rc.d
 
 do_install () {
-	autotools_do_install
+	meson_do_install
 
         # Create rauc config dir
         # Warn if system configuration was not overwritten
@@ -69,5 +69,16 @@ python __anonymous () {
 RRECOMMENDS:${PN}:append = " ${PN}-mark-good"
 
 FILES:${PN}-mark-good = "${systemd_unitdir}/system/rauc-mark-good.service ${sysconfdir}/init.d/rauc-mark-good"
+
+PACKAGES =+ "${PN}-service"
+SYSTEMD_SERVICE:${PN}-service = "rauc.service"
+SYSTEMD_PACKAGES += "${PN}-service"
+RDEPENDS:${PN}-service += "dbus"
+
+FILES:${PN}-service = "\
+  ${systemd_unitdir}/system/rauc.service \
+  ${datadir}/dbus-1/system.d/de.pengutronix.rauc.conf \
+  ${datadir}/dbus-1/system-services/de.pengutronix.rauc.service \
+  "
 
 PACKAGECONFIG ??= "service network streaming json nocreate gpt"
