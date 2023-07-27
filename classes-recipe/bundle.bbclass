@@ -79,6 +79,21 @@
 # Enable building casync bundles with
 #
 #   RAUC_CASYNC_BUNDLE = "1"
+#
+# To define custom manifest 'meta' sections, you may use
+# 'RAUC_META_SECTIONS' as follows:
+#
+#   RAUC_META_SECTIONS = "mydata foo"
+#
+#   RAUC_META_mydata[release-type] = "beta"
+#   RAUC_META_mydata[release-notes] = "a few notes here"
+#
+#   RAUC_META_foo[bar] = "baz"
+#
+# Adding any sort of additional lines to the manifest can be done with the
+# RAUC_MANIFEST_EXTRA_LINES variable (using '\n' to indicate newlines):
+#
+#   RAUC_MANIFEST_EXTRA_LINES = "[section]\nkey=value\n"
 
 LICENSE ?= "MIT"
 
@@ -239,7 +254,7 @@ def write_manifest(d):
             if slotflags and 'file' in slotflags:
                 imgsource = d.getVarFlag('RAUC_SLOT_%s' % slot, 'file')
             else:
-                imgsource = "%s-%s.%s" % (d.getVar('RAUC_SLOT_%s' % slot), machine, img_fstype)
+                imgsource = "%s-%s.rootfs.%s" % (d.getVar('RAUC_SLOT_%s' % slot), machine, img_fstype)
             imgname = imgsource
         elif imgtype == 'kernel':
             # TODO: Add image type support
@@ -309,6 +324,15 @@ def write_manifest(d):
                 raise bb.fatal('Failed to find source %s' % imgsource)
         if not os.path.exists(bundle_imgpath):
             raise bb.fatal("Failed adding image '%s' to bundle: not present in DEPLOY_DIR_IMAGE or WORKDIR" % imgsource)
+
+    for meta_section in (d.getVar('RAUC_META_SECTIONS') or "").split():
+        manifest.write("[meta.%s]\n" % meta_section)
+        for meta_key in d.getVarFlags('RAUC_META_%s' % meta_section):
+            meta_value = d.getVarFlag('RAUC_META_%s' % meta_section, meta_key)
+            manifest.write("%s=%s\n" % (meta_key, meta_value))
+        manifest.write("\n");
+
+    manifest.write((d.getVar('RAUC_MANIFEST_EXTRA_LINES') or "").replace(r'\n', '\n'))
 
     manifest.close()
 

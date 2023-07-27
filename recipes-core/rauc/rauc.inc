@@ -6,7 +6,8 @@ DEPENDS = "openssl glib-2.0 glib-2.0-native"
 
 inherit meson pkgconfig gettext
 
-EXTRA_OECONF += "\
+EXTRA_OEMESON += "\
+        -Dtests=false \
         -Dsystemdunitdir=${systemd_system_unitdir} \
         -Ddbuspolicydir=${datadir}/dbus-1/system.d \
         -Ddbussystemservicedir=${datadir}/dbus-1/system-services \
