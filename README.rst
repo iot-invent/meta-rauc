@@ -91,7 +91,6 @@ you have to follow at least the following steps:
    update file, please refer to the RAUC user documentation [1]_::
 
      FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-     SRC_URI:append := " file://system.conf"
 
 3. Create a bundle recipe for your device by adding a recipe
    that inherits the `bundle` class and adds all desired
@@ -173,8 +172,39 @@ in your local.conf. Note that this has the same effect as setting
 ``DEFAULT_PREFERENCE = "1"`` for each recipe (target/native/nativesdk)
 individually.
 
-VII. References
-===============
+VII. Contributing
+=================
+
+To report bugs, file a new `issue <https://github.com/rauc/meta-rauc/issues>`_
+on GitHub.
+
+For fixing bugs, bumping recipes or adding new features, open a `pull request
+<https://github.com/rauc/meta-rauc/pulls>`_ on GitHub.
+
+Add a ``Signed-off-by`` line to your commits according to the
+`Developer’s Certificate of Origin
+<https://github.com/rauc/meta-rauc/blob/master/DCO>`_.
+
+Backporting
+-----------
+
+For backporting changes to a stable or LTS branch, two options exist:
+
+a) drop a backport request in the original pull request
+b) backport on your own and create a new pull request
+
+When doing backports on your own, make sure to include a cherry-pick note and
+the original commit-ish in a line below the original Signed-off-by and add your
+own Signed-off-by below.
+When using git, this can be done automatically with::
+
+  git cherry-pick -xs <commit-ish>
+
+Note that backports will be acccepted for actively maintained `poky releases
+<https://wiki.yoctoproject.org/wiki/Releases>`_ only!
+
+VIII. References
+================
 
 .. [1] http://rauc.readthedocs.io/en/latest/
 
