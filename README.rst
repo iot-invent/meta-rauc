@@ -39,6 +39,18 @@ Please submit patches via GitHub pull request on https://github.com/rauc/meta-ra
 
 Maintainer: Enrico Joerns <ejo@pengutronix.de>
 
+Migration Notes
+===============
+
+Since **scarthgap**, the platform configuration (system.conf, keyring, etc.) was
+moved to a separate ``rauc-conf.bb`` recipe to allow building the rauc package
+with ``TUNE_PKGARCH`` and have a clearer separation between the binary and the
+configuration.
+
+Thus when updating to scarthgap or newer, make sure to move all
+configuration-specific adaptions from your ``rauc_%.bbappend`` to a
+``rauc-conf.bbappend`` file.
+
 
 I. Adding the rauc Layer to Your Build
 ======================================
@@ -62,13 +74,11 @@ other layers needed. e.g.::
 II. Building and Using RAUC Host Tool
 =====================================
 
-If you intend to build and use RAUC as a host tool from you BSP, e.g. for
+If you intend to build and use RAUC as a host tool from your BSP, e.g. for
 calling ``rauc info`` on your built bundle, simply run::
 
   bitbake rauc-native -caddto_recipe_sysroot
   oe-run-native rauc-native rauc info --keyring=/path/to/keyring.pem tmp/deploy/images/<machine>/<bundle-name>.raucb
-
-This will place the rauc binary at ``tmp/deploy/tools/rauc``.
 
 If you need to execute the ``casync`` host tool manually, you can do this by running::
 
@@ -85,7 +95,7 @@ you have to follow at least the following steps:
 
      DISTRO_FEATURES += "rauc"
 
-2. Add a ``rauc_%.bbappend`` in your device-specific (BSP) layer
+2. Add a ``rauc-conf.bbappend`` in your device-specific (BSP) layer
    that installs your RAUC system configuration file under
    ``/etc/rauc/system.conf``. For information on how to write the RAUC
    update file, please refer to the RAUC user documentation [1]_::
@@ -164,7 +174,7 @@ release.
 This is especially useful for early testing and adaption to upcoming features
 in RAUC.
 
-By default, the _git recipes are disabled. To enable it, you can set::
+By default, the _git recipes are disabled. To enable them, you can set::
 
   RAUC_USE_DEVEL_VERSION = "1"
 
