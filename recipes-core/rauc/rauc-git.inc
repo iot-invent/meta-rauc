@@ -2,10 +2,10 @@ SRC_URI = " \
   git://github.com/rauc/rauc.git;protocol=https;branch=master \
   "
 
-PV = "1.14+git${SRCPV}"
+PV = "1.15.1+git${SRCPV}"
 S = "${WORKDIR}/git"
 
-SRCREV = "2c455f87b96400779b77a3f87ac3d655a4c80bcf"
+SRCREV = "fac72b8347eed46f300d3a8a06e847ce1aa9d677"
 
 RAUC_USE_DEVEL_VERSION[doc] = "Global switch to enable RAUC development (git) version."
 RAUC_USE_DEVEL_VERSION ??= "-1"
